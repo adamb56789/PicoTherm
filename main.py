@@ -4,10 +4,7 @@ from dht import DHT22
 from umqtt.simple import MQTTClient
 import network, ssl, ubinascii, ntptime
 
-from config import DEVICE_NAME, WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
-
-# Time interval between reads in milliseconds
-READ_INTERVAL = 5*60*1000
+from config import DEVICE_NAME, DHT22_PIN, READ_INTERVAL, WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
 
 # Wi-Fi tries to connect every second this many times
 WIFI_TIMEOUT = 30
@@ -96,8 +93,8 @@ def read(timer):
     blink()
     print("Connected to broker")
 
-    # Read sensor on pin 0
-    dht = DHT22(Pin(0))
+    # Read sensor on pin in config
+    dht = DHT22(Pin(DHT22_PIN))
 
     dht.measure()
     temperature = dht.temperature()
