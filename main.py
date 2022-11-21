@@ -4,9 +4,7 @@ from dht import DHT22
 from umqtt.simple import MQTTClient
 import network, ssl, ubinascii, ntptime
 
-from secrets import WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
-
-DEVICE_NAME = "picotherm1"
+from config import DEVICE_NAME, WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
 
 # Time interval between reads in milliseconds
 READ_INTERVAL = 5*60*1000
