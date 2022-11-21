@@ -4,7 +4,7 @@ from dht import DHT22
 from umqtt.simple import MQTTClient
 import network, ssl, ubinascii, ntptime
 
-from config import DEVICE_NAME, DHT22_PIN, READ_INTERVAL, WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
+from config import DEVICE_ID, DHT22_PIN, READ_INTERVAL, WIFI_SSID, WIFI_PASSWORD, MQTT_CLIENT_KEY, MQTT_CLIENT_CERT, MQTT_BROKER, MQTT_BROKER_CA
 
 # Wi-Fi tries to connect every second this many times
 WIFI_TIMEOUT = 30
@@ -12,10 +12,10 @@ WIFI_TIMEOUT = 30
 # If connection fails with an error wait this many seconds before trying again
 WIFI_FAILURE_DELAY = 5
 
-# Get a human-readable unique ID
+# Get a unique ID for MQTT
 MQTT_CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 
-MQTT_TOPIC = "picotherm1"
+MQTT_TOPIC = "picotherm"
 
 # Blink LED for signalling or debugging
 def blink():
@@ -105,7 +105,7 @@ def read(timer):
         blink()
 
     # Upload the data
-    json = '{"temperature": ' + str(temperature) + ', "humidity": ' + str(humidity) + '}'
+    json = "{" + f'"id":{str(DEVICE_ID)},"temperature":{str(temperature)},"humidity":{str(humidity)}' + "}"
     print(f"Publishing {json} to {MQTT_TOPIC}")
     mqtt_client.publish(MQTT_TOPIC, json)
     
@@ -118,7 +118,8 @@ def read(timer):
     wlan.disconnect()
     wlan.active(False)
 
-# Read once then again with a given interval
+# Read sensor once then repeat with a given interval
+# Read sensor manually once because the timer always waits the full period first
 read(None)
 Timer().init(period=READ_INTERVAL, mode=Timer.PERIODIC, callback=read)
 
