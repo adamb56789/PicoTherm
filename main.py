@@ -15,7 +15,7 @@ WIFI_FAILURE_DELAY = 5
 # Get a unique ID for MQTT
 MQTT_CLIENT_ID = ubinascii.hexlify(machine.unique_id())
 
-MQTT_TOPIC = "picotherm"
+MQTT_TOPIC = "picotherm/" + str(DEVICE_ID)
 
 # Blink LED for signalling or debugging
 def blink():
@@ -61,8 +61,12 @@ def read(timer):
     # Handle connection error
     status = wlan.status()
     if status != 3:
-        # If connection still not working, go to sleep and try again next read
-        deepsleep(READ_INTERVAL)
+        # If connection still not working, go to sleep and try again next time
+        print("Connection completely failed, giving up")
+        mqtt_client.disconnect()
+        wlan.disconnect()
+        wlan.active(False)
+        sleep(1)
     else:
         print(f"Connected to Wi-Fi SSID: {WIFI_SSID}")
 
@@ -105,9 +109,9 @@ def read(timer):
         blink()
 
     # Upload the data
-    json = "{" + f'"id":{str(DEVICE_ID)},"temperature":{str(temperature)},"humidity":{str(humidity)}' + "}"
+    json = "{" + f'"temperature":{str(temperature)},"humidity":{str(humidity)}' + "}"
     print(f"Publishing {json} to {MQTT_TOPIC}")
-    mqtt_client.publish(MQTT_TOPIC, json)
+    mqtt_client.publish(MQTT_TOPIC, json, retain=True)
     
     # Wait to make sure it sends the data in time
     # This is probably too long but might as well be safe
@@ -117,6 +121,7 @@ def read(timer):
     mqtt_client.disconnect()
     wlan.disconnect()
     wlan.active(False)
+    sleep(1)
 
 # Read sensor once then repeat with a given interval
 # Read sensor manually once because the timer always waits the full period first
