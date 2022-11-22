@@ -33,7 +33,7 @@ def read_pem(file):
         base64_text = "".join(split_text[1:-1])
         return ubinascii.a2b_base64(base64_text)
 
-def read(timer):
+def connect_wifi():
     # Connect to Wi-Fi
     print(f"Connecting to Wi-Fi SSID: {WIFI_SSID}...")
     blink()
@@ -63,7 +63,6 @@ def read(timer):
     if status != 3:
         # If connection still not working, go to sleep and try again next time
         print("Connection completely failed, giving up")
-        mqtt_client.disconnect()
         wlan.disconnect()
         wlan.active(False)
         sleep(1)
@@ -72,7 +71,10 @@ def read(timer):
 
     # Time may need to be accurate for TLS to work
     ntptime.settime()
-
+    
+    return wlan
+    
+def connect_mqtt():
     # Read credentials and certificates then connect
     key = read_pem(MQTT_CLIENT_KEY)
     cert = read_pem(MQTT_CLIENT_CERT)
@@ -96,6 +98,13 @@ def read(timer):
     mqtt_client.connect()
     blink()
     print("Connected to broker")
+    
+    return mqtt_client
+
+def read(timer):
+    wlan = connect_wifi()
+
+    mqtt_client = connect_mqtt()
 
     # Read sensor on pin in config
     dht = DHT22(Pin(DHT22_PIN))
