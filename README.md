@@ -6,7 +6,7 @@ Reads from a DHT22 and publishes data to an encrypted MQTT topic - tested with A
 ## Running the code
 Create `config.py`containing:
 ```python
-DEVICE_NAME = "your_device_name_for_mqtt_topic"
+DEVICE_ID = 1 # Choose a unique numerical ID
 DHT22_PIN = 0 # the GPIO pin your DHT22 is connected to
 READ_INTERVAL = 5*60*1000 # in milliseconds
 WIFI_SSID = 'your_wifi_name'
